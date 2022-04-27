@@ -26,19 +26,50 @@
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
  
 const AppContext = React.createContext();
+const ENDPOINT = 'https://postman-echo.com/post';
 
-let AutoScreen =({navigation})=>{return(
+let sendDataToServer = (mode, commande_manuelle="none", commande_auto="none", objet_recherche="carre rouge") => {
+  fetch(ENDPOINT, {
+  method: 'POST',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    mode: mode,
+    commande_manuelle: commande_manuelle,
+    commande_auto : commande_auto,
+    objet_recherche : objet_recherche
+
+  })
+}).then((response) => response.json()).then((json)=>alert(JSON.stringify(json)))
+.catch((error) => {
+  console.error(error);
+});;
+}
+
+export class AutoScreen extends React.Component{
+
+  constructor(props){
+    alert(JSON.stringify(props)); 
+    super(props);
+    this.state ={};
+    
+  }
+
+  render(){
+  return(
   <View style={styles.mainContainer}>
     <Text style={styles.title}>Automatique</Text>
   <View style={styles.buttonView}>
     <Button
       style={styles.buttonStyle}
-      title="Entrer en mode automatique"
-    /><Button
-      title="Entrer en mode manuel"
-      onPress={() => navigation.navigate('Manual')}/>
+      title="Démarrer la recherche"
+    />
       </View>
     </View>);}
+    }
+
 
 
 export class ManualScreen extends React.Component {
@@ -53,33 +84,42 @@ export class ManualScreen extends React.Component {
     }
   }
 
+  
   onPressIn =(dir)=>{
     if(dir=='up'){
       this.setState({ up : true});
+      sendDataToServer("0", "none", "forward")
     }
     else if(dir=="down"){
       this.setState({ down : true});
+      sendDataToServer("0", "none", "backward")
     }
     else if(dir=="right"){
       this.setState({ right : true});
+      sendDataToServer("0", "none", "right")
     }
     else if(dir=="left"){
       this.setState({ left : true});
+      sendDataToServer("0", "none", "left")
     }
     
 }
   onPressOut =(dir)=>{
     if(dir=='up'){
       this.setState({ up : false});
+      sendDataToServer("0", "none", "none")
     }
     else if(dir=="down"){
       this.setState({ down : false});
+      sendDataToServer("0", "none", "none")
     }
     else if(dir=="right"){
       this.setState({ right : false});
+      sendDataToServer("0", "none", "none")
     }
     else if(dir=="left"){
       this.setState({ left : false});
+      sendDataToServer("0", "none", "none")
     }
 }
 
@@ -128,7 +168,7 @@ ManualScreen.contextType = AppContext;
      <Button
        style={styles.buttonStyle}
        title="Entrer en mode automatique"
-       onPress={() => this.props.navigation.navigate('Auto', {state : state})}
+       onPress={() => this.props.navigation.navigate('Auto')}
      /><Button
        title="Entrer en mode manuel"
        onPress={() => this.props.navigation.navigate('Manual')}/>
