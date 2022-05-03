@@ -20,6 +20,7 @@
    
  } from 'react-native';
  
+ import {Picker} from '@react-native-picker/picker';
  import {
  
  } from 'react-native/Libraries/NewAppScreen';
@@ -48,25 +49,68 @@ let sendDataToServer = (mode, commande_manuelle="none", commande_auto="none", ob
 });;
 }
 
+
+
 export class AutoScreen extends React.Component{
 
   constructor(props){
     alert(JSON.stringify(props)); 
     super(props);
-    this.state ={};
+    this.state ={selectedSearchItem : "carre rouge",
+    searchState : false,
+  toggleSearchText : "Démarrer la recherche",
+  chronoValue : 0,
+  chronoInterval : null};
+    
+  }
+
+  increaseChrono = () =>{
+    this.setState({chronoValue : 1 + this.state.chronoValue})
+  }
+  startChrono = () =>{
+    this.setState({chronoInterval : setInterval( this.increaseChrono,1000)})
+  }
+
+  stopChrono = () =>{
+    clearInterval(this.state.chronoInterval)
+    this.setState({chronoValue : 0})
+  }
+  startSearch = () =>{
+    if (!this.state.searchState){
+      this.setState({toggleSearchText : "Arrêter la recherche", searchState : true})
+      sendDataToServer(1, "none", "start", this.state.selectedSearchItem)
+      this.startChrono()
+    }
+    else {
+      this.setState({toggleSearchText : "Démarrer la recherche", searchState : false})
+      sendDataToServer(1,"none", "stop", this.state.selectedSearchItem)
+      this.stopChrono()
+    }
     
   }
 
   render(){
   return(
   <View style={styles.mainContainer}>
-    <Text style={styles.title}>Automatique</Text>
+    <Text style={styles.title}>{this.state.chronoValue}</Text>
+  <View><Picker style={[styles.buttonStyle, {backgroundColor : '#2196F3'}]}
+  selectedValue={this.state.selectedSearchItem}
+  onValueChange={(itemValue, itemIndex) =>
+    {
+    this.setState({selectedSearchItem : itemValue})
+    }
+  }>
+  <Picker.Item label="Carré Rouge" value="carre rouge"/>
+  <Picker.Item label="Carré Bleu" value="carre bleu" />
+</Picker></View>
   <View style={styles.buttonView}>
     <Button
-      style={styles.buttonStyle}
-      title="Démarrer la recherche"
+      style={[styles.buttonView, styles.blackText]}
+      title={this.state.toggleSearchText}
+      onPress={this.startSearch}
     />
       </View>
+      
     </View>);}
     }
 
@@ -237,7 +281,8 @@ class App extends React.Component  {
   },
   videoFeedback:{
     flex:1
-  }
+  },
+
  });
  
  export default App;
