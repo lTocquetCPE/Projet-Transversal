@@ -16,7 +16,9 @@
    useColorScheme,
    View,
    Button,
-   TouchableHighlight
+   TouchableHighlight,
+   TouchableOpacity,
+   Image
    
  } from 'react-native';
  
@@ -27,7 +29,7 @@
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
  
 const AppContext = React.createContext();
-const ENDPOINT = 'https://postman-echo.com/post';
+const ENDPOINT = 'http://192.168.35.212:5000/transversalApi';
 
 let sendDataToServer = (mode, commande_manuelle="none", commande_auto="none", objet_recherche="carre rouge") => {
   fetch(ENDPOINT, {
@@ -43,7 +45,7 @@ let sendDataToServer = (mode, commande_manuelle="none", commande_auto="none", ob
     objet_recherche : objet_recherche
 
   })
-}).then((response) => response.json()).then((json)=>alert(JSON.stringify(json)))
+})//.then((response) => response.json()).then((json)=>alert(JSON.stringify(json)))
 .catch((error) => {
   console.error(error);
 });;
@@ -174,22 +176,26 @@ export class ManualScreen extends React.Component {
         <View style={styles.videoFeedback}></View>
       <View style={styles.directionnalPadView}>
         <View style={styles.topPadView}>
-        <Pressable onPressIn={()=>this.onPressIn('up')}
+        <TouchableOpacity onPressIn={()=>this.onPressIn('up')}
         onPressOut={()=>this.onPressOut('up')}>
-          <Text>UP</Text>
-        </Pressable>
+      <Image style={styles.imageStyle} source={require('./key_up.png')} />
+        </TouchableOpacity>
         </View>
         <View style={styles.midPadView}>
-        <Pressable onPressIn={()=>this.onPressIn('left')}
-        onPressOut={()=>this.onPressOut('left')}><Text>Left</Text></Pressable>
-        <Pressable onPressIn={()=>this.onPressIn('right')}
-        onPressOut={()=>this.onPressOut('right')}><Text>Right</Text></Pressable>
+        <TouchableOpacity  onPressIn={()=>this.onPressIn('left')}
+        onPressOut={()=>this.onPressOut('left')}>
+      <Image style={styles.imageStyle}  source={require('./key_left.png')} />
+        </TouchableOpacity>
+        <TouchableOpacity onPressIn={()=>this.onPressIn('right')}
+        onPressOut={()=>this.onPressOut('right')}>
+      <Image style={styles.imageStyle} source={require('./key_right.png')} />
+        </TouchableOpacity>
         </View>
         <View style={styles.botPadView}>
-        <Pressable onPressIn={()=>this.onPressIn('down')}
+        <TouchableOpacity onPressIn={()=>this.onPressIn('down')}
         onPressOut={()=>this.onPressOut('down')}>
-          <Text>Down</Text>
-        </Pressable>
+      <Image style={styles.imageStyle} source={require('./key_down.png')} />
+        </TouchableOpacity>
         </View>
           </View>
         </View>);
@@ -261,7 +267,7 @@ class App extends React.Component  {
    },
    directionnalPadView:{
     flex : 1,
-    paddingTop : 30,
+    paddingTop : 0,
     backgroundColor : 'grey'
   },
   topPadView:{
@@ -282,6 +288,10 @@ class App extends React.Component  {
   videoFeedback:{
     flex:1
   },
+  imageStyle :{
+    height: 100,
+    width: 100
+  }
 
  });
  
