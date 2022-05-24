@@ -6,9 +6,10 @@
  * @flow strict-local
  */
 
- import React from 'react';
  import { NavigationContainer } from '@react-navigation/native';
  import { createNativeStackNavigator } from '@react-navigation/native-stack';
+ import React, { Component } from 'react';
+import { WebView } from 'react-native-webview';
  import type {Node} from 'react';
  import {
    StyleSheet,
@@ -18,7 +19,7 @@
    Button,
    TouchableHighlight,
    TouchableOpacity,
-   Image
+   Image,
    
  } from 'react-native';
  
@@ -29,7 +30,7 @@
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
  
 const AppContext = React.createContext();
-const ENDPOINT = 'http://192.168.35.212:5000/transversalApi';
+const ENDPOINT = 'http://192.168.237.212:5000/transversalApi';
 
 let sendDataToServer = (mode, commande_manuelle="none", commande_auto="none", objet_recherche="carre rouge") => {
   fetch(ENDPOINT, {
@@ -56,7 +57,7 @@ let sendDataToServer = (mode, commande_manuelle="none", commande_auto="none", ob
 export class AutoScreen extends React.Component{
 
   constructor(props){
-    alert(JSON.stringify(props)); 
+    //alert(JSON.stringify(props)); 
     super(props);
     this.state ={selectedSearchItem : "carre rouge",
     searchState : false,
@@ -85,7 +86,7 @@ export class AutoScreen extends React.Component{
     }
     else {
       this.setState({toggleSearchText : "Démarrer la recherche", searchState : false})
-      sendDataToServer(1,"none", "stop", this.state.selectedSearchItem)
+      sendDataToServer(0,"none", "stop", this.state.selectedSearchItem)
       this.stopChrono()
     }
     
@@ -120,7 +121,7 @@ export class AutoScreen extends React.Component{
 
 export class ManualScreen extends React.Component {
   constructor(props){
-    alert(JSON.stringify(props)); 
+    //alert(JSON.stringify(props)); 
     super(props);
     this.state ={
       up : false,
@@ -134,46 +135,52 @@ export class ManualScreen extends React.Component {
   onPressIn =(dir)=>{
     if(dir=='up'){
       this.setState({ up : true});
-      sendDataToServer("0", "none", "forward")
+      sendDataToServer(0,  "forward", "none")
     }
     else if(dir=="down"){
       this.setState({ down : true});
-      sendDataToServer("0", "none", "backward")
+      sendDataToServer(0, "backward", "none")
     }
     else if(dir=="right"){
       this.setState({ right : true});
-      sendDataToServer("0", "none", "right")
+      sendDataToServer(0, "right", "none")
     }
     else if(dir=="left"){
       this.setState({ left : true});
-      sendDataToServer("0", "none", "left")
+      sendDataToServer(0, "left", "none")
     }
     
 }
   onPressOut =(dir)=>{
     if(dir=='up'){
       this.setState({ up : false});
-      sendDataToServer("0", "none", "none")
+      sendDataToServer(0, "none", "none")
     }
     else if(dir=="down"){
       this.setState({ down : false});
-      sendDataToServer("0", "none", "none")
+      sendDataToServer(0, "none", "none")
     }
     else if(dir=="right"){
       this.setState({ right : false});
-      sendDataToServer("0", "none", "none")
+      sendDataToServer(0, "none", "none")
     }
     else if(dir=="left"){
       this.setState({ left : false});
-      sendDataToServer("0", "none", "none")
+      sendDataToServer(0, "none", "none")
     }
 }
 
   render() {
       return (
         <View style={styles.mainContainer}>
-        <Text style={styles.title}>Ecran Manuel, {this.state.up ? "UP" : "NOTUP"}, {this.state.right ? "RIGHT" : "NOTRIGHT"}, {this.state.down ? "DOWN" : "NOTDOWN"}, {this.state.left ? "LEFT" : "NOTLEFT"}</Text>
-        <View style={styles.videoFeedback}></View>
+        <View style={styles.videoFeedback}>
+        <WebView
+        source={{
+          uri: ENDPOINT + '/video'
+        }}
+        style={{ marginTop: 20 }}
+      />
+        </View>
       <View style={styles.directionnalPadView}>
         <View style={styles.topPadView}>
         <TouchableOpacity onPressIn={()=>this.onPressIn('up')}
@@ -213,7 +220,6 @@ ManualScreen.contextType = AppContext;
   render(){
     return(<React.Fragment>
    <View style={styles.mainContainer}>
-     <Text style={styles.title}>Accueil, {JSON.stringify(this.props)}</Text>
    <View style={styles.buttonView}>
      <Button
        style={styles.buttonStyle}
